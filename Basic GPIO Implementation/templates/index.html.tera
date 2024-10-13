@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basic GPIO and Analog Control</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column; /* Stack the content vertically */
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .button-container, .slider-container {
+            display: flex;
+            justify-content: space-between;
+            width: 80%;
+            max-width: 800px;
+            background-color: white;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px; /* Space between sections */
+        }
+
+        .button-column, .slider-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        button {
+            font-size: 16px;
+            padding: 10px 20px;
+            background-color: green;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .slider {
+            width: 100%; /* Full width for sliders */
+        }
+
+        .slider-label {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+    </style>
+    <script>
+        function toggleColor(button) {
+            if (button.style.backgroundColor === 'red') {
+                button.style.backgroundColor = 'green';
+            } else {
+                button.style.backgroundColor = 'red';
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="button-container">
+        <h1>Basic GPIO Control</h1>
+        <div class="button-column">
+            {% for i in buttons %}
+                {% if loop.index <= 5 %}
+                    <button type="button" onclick="toggleColor(this)">Pin {{ i }}</button>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <div class="button-column">
+            {% for i in buttons %}
+                {% if loop.index > 5 %}
+                    <button type="button" onclick="toggleColor(this)">Pin {{ i }}</button>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- New Section for Analog Voltage Control -->
+    <div class="slider-container">
+        <h1>Basic Analog Voltage Control</h1>
+        <div class="slider-column">
+            {% for i in sliders %}
+                <div class="slider-label">Pin {{ i }}</div>
+                <input type="range" min="0" max="100" value="50" class="slider" id="slider-{{ i }}">
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
