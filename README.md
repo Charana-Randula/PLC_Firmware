@@ -1,2 +1,2 @@
-# Basic_GPIO_Firmware
-Basic GPIO control implementation for software defined PLC project.
+# An Open-Source PLC Firmware based on Rust and Rocket.rs 
+A software defined PLC project.
