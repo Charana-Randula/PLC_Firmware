@@ -1,0 +1,12 @@
+/home/charana/Documents/PLC_Firmware/Basic GPIO Implementation/target/debug/deps/libignore-35a0b8525130982b.rmeta: /home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ignore-0.4.23/src/lib.rs /home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ignore-0.4.23/src/default_types.rs /home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ignore-0.4.23/src/dir.rs /home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ignore-0.4.23/src/gitignore.rs /home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ignore-0.4.23/src/overrides.rs /home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ignore-0.4.23/src/pathutil.rs /home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ignore-0.4.23/src/types.rs /home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ignore-0.4.23/src/walk.rs
+
+/home/charana/Documents/PLC_Firmware/Basic GPIO Implementation/target/debug/deps/ignore-35a0b8525130982b.d: /home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ignore-0.4.23/src/lib.rs /home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ignore-0.4.23/src/default_types.rs /home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ignore-0.4.23/src/dir.rs /home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ignore-0.4.23/src/gitignore.rs /home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ignore-0.4.23/src/overrides.rs /home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ignore-0.4.23/src/pathutil.rs /home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ignore-0.4.23/src/types.rs /home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ignore-0.4.23/src/walk.rs
+
+/home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ignore-0.4.23/src/lib.rs:
+/home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ignore-0.4.23/src/default_types.rs:
+/home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ignore-0.4.23/src/dir.rs:
+/home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ignore-0.4.23/src/gitignore.rs:
+/home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ignore-0.4.23/src/overrides.rs:
+/home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ignore-0.4.23/src/pathutil.rs:
+/home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ignore-0.4.23/src/types.rs:
+/home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ignore-0.4.23/src/walk.rs:

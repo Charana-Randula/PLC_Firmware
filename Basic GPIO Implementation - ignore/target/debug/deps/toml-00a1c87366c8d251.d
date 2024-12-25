@@ -1,0 +1,13 @@
+/home/charana/Documents/PLC_Firmware/Basic GPIO Implementation/target/debug/deps/libtoml-00a1c87366c8d251.rmeta: /home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/toml-0.8.19/src/lib.rs /home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/toml-0.8.19/src/map.rs /home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/toml-0.8.19/src/value.rs /home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/toml-0.8.19/src/de.rs /home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/toml-0.8.19/src/ser.rs /home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/toml-0.8.19/src/macros.rs /home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/toml-0.8.19/src/edit.rs /home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/toml-0.8.19/src/fmt.rs /home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/toml-0.8.19/src/table.rs
+
+/home/charana/Documents/PLC_Firmware/Basic GPIO Implementation/target/debug/deps/toml-00a1c87366c8d251.d: /home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/toml-0.8.19/src/lib.rs /home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/toml-0.8.19/src/map.rs /home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/toml-0.8.19/src/value.rs /home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/toml-0.8.19/src/de.rs /home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/toml-0.8.19/src/ser.rs /home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/toml-0.8.19/src/macros.rs /home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/toml-0.8.19/src/edit.rs /home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/toml-0.8.19/src/fmt.rs /home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/toml-0.8.19/src/table.rs
+
+/home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/toml-0.8.19/src/lib.rs:
+/home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/toml-0.8.19/src/map.rs:
+/home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/toml-0.8.19/src/value.rs:
+/home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/toml-0.8.19/src/de.rs:
+/home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/toml-0.8.19/src/ser.rs:
+/home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/toml-0.8.19/src/macros.rs:
+/home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/toml-0.8.19/src/edit.rs:
+/home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/toml-0.8.19/src/fmt.rs:
+/home/charana/.cargo/registry/src/index.crates.io-6f17d22bba15001f/toml-0.8.19/src/table.rs:
