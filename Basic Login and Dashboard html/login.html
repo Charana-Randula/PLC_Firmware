@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLC Login</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Background Styling */
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #ffcccc, #cce7ff); /* Light red and blue */
+            font-family: 'Arial', sans-serif;
+            overflow: hidden; /* Prevent scrolling */
+        }
+
+        /* Glassmorphism Effect */
+        .glass {
+            backdrop-filter: blur(15px);
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* Mobile Optimizations */
+        @media (max-width: 640px) {
+            .login-box {
+                width: 90%; /* Make the box take up more space on mobile */
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Box -->
+    <div class="glass w-full max-w-md login-box p-12 sm:p-8 md:p-10 lg:p-12 xl:p-16 rounded-xl space-y-8 z-10">
+        <!-- Header -->
+        <div class="text-center">
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-800">Control Panel Login</h1>
+            <p class="text-sm sm:text-base text-gray-600">Secure access to your Raspberry Pi PLC application</p>
+        </div>
+
+        <!-- Login Form -->
+        <form action="#" method="POST" class="space-y-6">
+            <!-- Username Input -->
+            <div>
+                <label for="username" class="block text-sm sm:text-base font-medium text-gray-700">Username</label>
+                <input type="text" id="username" name="username" required 
+                       class="mt-2 w-full px-6 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none" 
+                       placeholder="Enter your username">
+            </div>
+
+            <!-- Password Input -->
+            <div>
+                <label for="password" class="block text-sm sm:text-base font-medium text-gray-700">Password</label>
+                <input type="password" id="password" name="password" required 
+                       class="mt-2 w-full px-6 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none" 
+                       placeholder="Enter your password">
+            </div>
+
+            <!-- Login Button -->
+            <div>
+                <button type="submit" 
+                        class="w-full py-3 px-6 text-white font-semibold rounded-lg shadow-md bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    Login
+                </button>
+            </div>
+        </form>
+
+        <!-- Footer -->
+        <div class="text-center text-sm text-gray-500 mt-8">
+            <p>&copy; 2025 Raspberry Pi PLC Application</p>
+        </div>
+    </div>
+</body>
+</html>

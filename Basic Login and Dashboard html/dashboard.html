@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editable Grid with Embedded Websites</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            background: linear-gradient(135deg, #ffcccc, #cce7ff); /* Gradient background */
+ 
+        }
+
+        /* Style for the sidebar links */
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: #333;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .sidebar a i {
+            margin-right: 10px;
+        }
+
+        .sidebar a:hover {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        /* Style for the bottom section of the sidebar */
+        .sidebar-bottom {
+            margin-top: auto;
+        }
+
+        /* Adjust the sidebar for smaller screens */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 100%;
+                z-index: 10;
+            }
+        }
+
+
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            padding-left: 10px; /* Adjust to fit the sidebar */
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* 2 columns */
+            grid-template-rows: repeat(2, 1fr); /* 2 rows */
+            width: 100%;
+            height: 100%;
+            gap: 0;
+            overflow: hidden;
+        }
+
+        .grid-item {
+            background: white;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            flex-direction: column;
+            padding: 10px;
+            text-align: center;
+            font-size: 14px;
+            overflow: hidden;
+            resize: both;
+            overflow: auto;
+        }
+
+        .edit-button {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .iframe-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden; /* Hide any overflow */
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+            object-fit: contain; /* Scale content to fit */
+        }
+
+
+
+        /* Modal and overlay styles */
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            z-index: 1000;
+            display: none;
+        }
+
+        .modal textarea {
+            width: 100%;
+            height: 100px;
+            margin-bottom: 10px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <a href="#dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <a href="#control"><i class="fas fa-cogs"></i> Control</a>
+        <a href="#code"><i class="fas fa-code"></i> Rust Code</a>
+        <a href="#api"><i class="fas fa-plug"></i> API</a>
+        <div class="sidebar-bottom">
+            <a href="#profile"><i class="fas fa-user"></i> Profile</a>
+            <a href="#settings"><i class="fas fa-cogs"></i> Settings</a>
+            <a href="#logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </div>    
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+        <div class="grid-container" id="gridContainer">
+            <!-- Grid items with embedded sites -->
+            <div class="grid-item" id="box1" tabindex="0" data-row="1" data-col="1" data-file="box1.html">
+                <div class="iframe-container">
+                    <iframe src="http://[::]:8001/gridplots/box1.html" title="Box 1"></iframe>
+                </div>
+                <button class="edit-button">Edit</button>
+            </div>
+            <div class="grid-item" id="box2" tabindex="0" data-row="1" data-col="2" data-file="box2.html">
+                <div class="iframe-container">
+                    <iframe src="http://[::]:8001/gridplots/box2.html" title="Box 2"></iframe>
+                </div>
+                <button class="edit-button">Edit</button>
+            </div>
+            <div class="grid-item" id="box3" tabindex="0" data-row="2" data-col="1" data-file="box3.html">
+                <div class="iframe-container">
+                    <iframe src="http://[::]:8001/gridplots/box3.html" title="Box 3"></iframe>
+                </div>
+                <button class="edit-button">Edit</button>
+            </div>
+            <div class="grid-item" id="box4" tabindex="0" data-row="2" data-col="2" data-file="box4.html">
+                <div class="iframe-container">
+                    <iframe src="http://[::]:8001/gridplots/box4.html" title="Box 4"></iframe>
+                </div>
+                <button class="edit-button">Edit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for editing HTML -->
+    <div id="modal" class="modal">
+        <textarea id="htmlInput" placeholder="Enter HTML here..."></textarea>
+        <button id="saveButton">Save</button>
+        <button id="cancelButton">Cancel</button>
+    </div>
+    <div id="modalOverlay" class="modal-overlay"></div>
+
+    <script>
+        const gridContainer = document.getElementById('gridContainer');
+        const modal = document.getElementById('modal');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const htmlInput = document.getElementById('htmlInput');
+        const saveButton = document.getElementById('saveButton');
+        const cancelButton = document.getElementById('cancelButton');
+
+        let currentEditingBox = null;
+
+        gridContainer.addEventListener('click', (event) => {
+            if (event.target.classList.contains('edit-button')) {
+                currentEditingBox = event.target.parentElement;
+                const fileName = currentEditingBox.getAttribute('data-file');
+                // Fetch the HTML content from the corresponding file
+                fetch(`gridplots/${fileName}`)
+                    .then(response => response.text())
+                    .then(data => {
+                        // Insert HTML content
+                        currentEditingBox.innerHTML = `<div class="iframe-container">
+                            <iframe src="http://[::]:8001/gridplots/${fileName}" title="Embedded Content"></iframe>
+                        </div> <button class="edit-button">Edit</button>`;
+                        
+                        // Show modal for editing
+                        htmlInput.value = data;
+                        modal.style.display = 'block';
+                        modalOverlay.style.display = 'block';
+                    })
+                    .catch(error => console.error('Error loading file:', error));
+            }
+        });
+
+        saveButton.addEventListener('click', () => {
+            if (currentEditingBox) {
+                currentEditingBox.innerHTML = `<div class="iframe-container">
+                    <iframe src="http://[::]:8001/gridplots/${currentEditingBox.getAttribute('data-file')}" title="Embedded Content"></iframe>
+                </div> <button class="edit-button">Edit</button>`;
+            }
+            closeModal();
+        });
+
+        cancelButton.addEventListener('click', closeModal);
+        modalOverlay.addEventListener('click', closeModal);
+
+        function closeModal() {
+            modal.style.display = 'none';
+            modalOverlay.style.display = 'none';
+            currentEditingBox = null;
+        }
+
+    </script>
+</body>
+</html>

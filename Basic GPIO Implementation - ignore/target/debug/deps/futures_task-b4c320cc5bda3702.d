@@ -1,0 +1,10 @@
+/Users/charanarandula/Desktop/EEP1/Basic GPIO Implementation - ignore/target/debug/deps/libfutures_task-b4c320cc5bda3702.rmeta: /Users/charanarandula/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-task-0.3.31/src/lib.rs /Users/charanarandula/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-task-0.3.31/src/spawn.rs /Users/charanarandula/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-task-0.3.31/src/future_obj.rs /Users/charanarandula/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-task-0.3.31/src/noop_waker.rs
+
+/Users/charanarandula/Desktop/EEP1/Basic GPIO Implementation - ignore/target/debug/deps/libfutures_task-b4c320cc5bda3702.rlib: /Users/charanarandula/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-task-0.3.31/src/lib.rs /Users/charanarandula/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-task-0.3.31/src/spawn.rs /Users/charanarandula/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-task-0.3.31/src/future_obj.rs /Users/charanarandula/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-task-0.3.31/src/noop_waker.rs
+
+/Users/charanarandula/Desktop/EEP1/Basic GPIO Implementation - ignore/target/debug/deps/futures_task-b4c320cc5bda3702.d: /Users/charanarandula/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-task-0.3.31/src/lib.rs /Users/charanarandula/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-task-0.3.31/src/spawn.rs /Users/charanarandula/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-task-0.3.31/src/future_obj.rs /Users/charanarandula/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-task-0.3.31/src/noop_waker.rs
+
+/Users/charanarandula/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-task-0.3.31/src/lib.rs:
+/Users/charanarandula/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-task-0.3.31/src/spawn.rs:
+/Users/charanarandula/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-task-0.3.31/src/future_obj.rs:
+/Users/charanarandula/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-task-0.3.31/src/noop_waker.rs:
