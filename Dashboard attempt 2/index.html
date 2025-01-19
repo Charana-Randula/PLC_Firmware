@@ -7,80 +7,6 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* New Toggle Switch Styles */
-        .switch {
-            --circle-dim: 1em;
-            font-size: 17px;
-            position: relative;
-            display: inline-block;
-            width: 3em;
-            height: 1.5em;
-        }
-
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #f5aeae;
-            transition: .4s;
-            border-radius: 30px;
-        }
-
-        .slider-card {
-            position: absolute;
-            content: "";
-            height: var(--circle-dim);
-            width: var(--circle-dim);
-            border-radius: 20px;
-            left: 0.3em;
-            bottom: 0.3em;
-            transition: .4s;
-            pointer-events: none;
-        }
-
-        .slider-card-face {
-            position: absolute;
-            inset: 0;
-            backface-visibility: hidden;
-            perspective: 1000px;
-            border-radius: 50%;
-            transition: .4s transform;
-        }
-
-        .slider-card-front {
-            background-color: #DC3535;
-        }
-
-        .slider-card-back {
-            background-color: #379237;
-            transform: rotateY(180deg);
-        }
-
-        input:checked ~ .slider-card .slider-card-back {
-            transform: rotateY(0);
-        }
-
-        input:checked ~ .slider-card .slider-card-front {
-            transform: rotateY(-180deg);
-        }
-
-        input:checked ~ .slider-card {
-            transform: translateX(1.5em);
-        }
-
-        input:checked ~ .slider {
-            background-color: #9ed99c;
-        }
-
         /* Dark mode styles */
         html.dark {
             background-color: #1a1a1a;
@@ -185,6 +111,51 @@
                 background: #2d2d2d;
             }
         }
+        .checkbox {
+            display: none;
+        }
+
+        .switch {
+            position: relative;
+            width: 25px;
+            height: 25px;
+            background-color: rgb(231, 206, 236); /* Red background */
+            border-radius: 50%;
+            z-index: 1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgb(126, 126, 126);
+            box-shadow: 0px 0px 3px rgb(2, 2, 2) inset;
+        }
+
+        .switch svg {
+            width: 1.2em;
+        }
+
+        .switch svg path {
+            fill: rgb(48, 48, 48);
+        }
+
+        .checkbox:checked + .switch {
+            box-shadow: 0px 0px 1px rgb(255, 99, 99) inset,
+                0px 0px 2px rgb(255, 99, 99) inset,
+                0px 0px 10px rgb(255, 99, 99) inset,
+                0px 0px 40px rgb(255, 99, 99),
+                0px 0px 100px rgb(255, 99, 99),
+                0px 0px 5px rgb(255, 99, 99); /* Red glow effect */
+            border: 2px solid rgb(255, 255, 255);
+            background-color: rgb(255, 144, 144); /* Lighter red when checked */
+        }
+
+        .checkbox:checked + .switch svg {
+            filter: drop-shadow(0px 0px 5px rgb(255, 99, 99)); /* Red shadow */
+        }
+
+        .checkbox:checked + .switch svg path {
+            fill: rgb(255, 255, 255); /* White icon when checked */
+        }
     </style>
 </head>
 <body class="bg-gray-100 font-sans">
@@ -207,7 +178,7 @@
 
             <!-- Navigation links -->
             <div class="nav-links hidden md:flex items-center space-x-4">
-              <a>
+              <a href="#" class="px-0.1 py-0.1 text-sm text-gray-600 hover:bg-gray-100 rounded-md flex items-center gap-2">
             </a>
             <a href="#" class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md flex items-center gap-2">
               <i class="fas fa-home"></i>
@@ -312,17 +283,17 @@
         container.innerHTML = state.digitalInputs.map((value, i) => `
             <div class="flex justify-between items-center">
                 <span class="text-sm font-medium text-purple-700">Input ${i + 1}</span>
-                <label class="switch">
-                    <input type="checkbox" ${value ? 'checked' : ''} onchange="toggleDigitalInput(${i})">
-                    <span class="slider"></span>
-                    <span class="slider-card">
-                        <span class="slider-card-face slider-card-front"></span>
-                        <span class="slider-card-face slider-card-back"></span>
-                    </span>
-                </label>
+                <div>
+                    <input id="input-checkbox-${i}" class="checkbox" type="checkbox" ${value ? 'checked' : ''} onchange="toggleDigitalInput(${i})">
+                    <label class="switch" for="input-checkbox-${i}">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="slider">
+                        </svg>
+                    </label>
+                </div>
             </div>
         `).join('');
-        }
+    }
+
 
         function renderAnalogInputs() {
             const container = document.getElementById('analogInputs');
@@ -345,17 +316,16 @@
         container.innerHTML = state.digitalOutputs.map((value, i) => `
             <div class="flex justify-between items-center">
                 <span class="text-sm font-medium text-purple-700">Output ${i + 1}</span>
-                <label class="switch">
-                    <input type="checkbox" ${value ? 'checked' : ''} onchange="toggleDigitalOutput(${i})">
-                    <span class="slider"></span>
-                    <span class="slider-card">
-                        <span class="slider-card-face slider-card-front"></span>
-                        <span class="slider-card-face slider-card-back"></span>
-                    </span>
-                </label>
+                <div>
+                    <input id="output-checkbox-${i}" class="checkbox" type="checkbox" ${value ? 'checked' : ''} onchange="toggleDigitalOutput(${i})">
+                    <label class="switch" for="output-checkbox-${i}">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="slider">
+                        </svg>
+                    </label>
+                </div>
             </div>
         `).join('');
-        }
+    }
 
 
         function renderAnalogOutputs() {
