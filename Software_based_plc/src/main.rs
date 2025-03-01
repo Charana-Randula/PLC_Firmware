@@ -107,6 +107,19 @@ fn dash(cookies: &CookieJar<'_>) -> Result<(rocket::http::ContentType, Option<Ve
     }
 }
 
+// Dashboard route that requires authentication
+#[get("/api.html")]
+fn api(cookies: &CookieJar<'_>) -> Result<(rocket::http::ContentType, Option<Vec<u8>>), Redirect> {
+    if cookies.get("user_id").is_some() {
+        Ok((
+            rocket::http::ContentType::HTML,
+            std::fs::read(relative!("templates/api.html")).ok(),
+        ))
+    } else {
+        Err(Redirect::to("/login.html")) // Redirect to login if not logged in
+    }
+}
+
 // Handle missing favicon.ico requests gracefully
 #[get("/favicon.ico")]
 fn favicon() -> &'static str {
@@ -120,6 +133,6 @@ fn rocket() -> _ {
 
     rocket::build()
         .manage(db_conn) // Share the database connection globally
-        .mount("/", routes![index, login, process_login, dash, favicon])
+        .mount("/", routes![index, login, process_login, dash,api, favicon])
         .mount("/", FileServer::from(relative!("templates")))
 }
