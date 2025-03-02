@@ -11,6 +11,7 @@ use bcrypt::verify; // For bcrypt password hashing
 use std::sync::Arc; // For wrapping Mutex in Arc to share across threads
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::collections::HashMap;
+use time::{Duration, OffsetDateTime};
 
 #[derive(Clone)]
 struct AppState {
@@ -78,35 +79,49 @@ fn index() -> Redirect {
 
 // Serve login.html page
 #[get("/login.html")]
-fn login() -> (rocket::http::ContentType, Option<Vec<u8>>) {
+fn login(cookies: &CookieJar<'_>) -> (rocket::http::ContentType, Option<Vec<u8>>) {
+    // Remove all cookies with path "/"
+    for cookie in cookies.iter() {
+        let mut expired_cookie = Cookie::from(cookie.name().to_string());
+        expired_cookie.set_path("/"); // Ensure correct path
+        expired_cookie.set_expires(OffsetDateTime::UNIX_EPOCH); // Expire immediately
+        cookies.remove(expired_cookie); // Properly remove the cookie
+    }
+
+    // Serve the login page
     (
         rocket::http::ContentType::HTML,
         std::fs::read(relative!("templates/login.html")).ok(),
     )
 }
 
-// Modify your login function to use a session token instead of username
 #[post("/login", data = "<credentials>")]
 async fn process_login(
     credentials: Form<Credentials>,
     cookies: &CookieJar<'_>,
     state: &State<AppState>,
 ) -> Result<Redirect, &'static str> {
+    
     match state.db_conn.verify_password(&credentials.username, &credentials.password).await {
         Ok(true) => {
             // Generate a unique session token
             let session_id = format!("session_{}", state.session_counter.fetch_add(1, Ordering::SeqCst));
-            
+
             // Store the session in our active sessions
             let mut sessions = state.active_sessions.lock().await;
             sessions.insert(session_id.clone(), true);
-            
+
             // Set cookie with the session token
             let mut cookie = Cookie::new("session_id", session_id);
             cookie.set_path("/");
+
+            let mut now = OffsetDateTime::now_utc();
+            now += Duration::hours(2);
+            cookie.set_expires(now);
+
             cookie.set_http_only(true); // More secure
             cookies.add(cookie);
-            
+
             Ok(Redirect::to("/dashboard.html"))
         }
         Ok(false) => Err("Invalid username or password"),
@@ -154,27 +169,6 @@ async fn api(
     Err(Redirect::to("/login.html"))
 }
 
-// Modify your logout function
-#[get("/logout")]
-async fn logout(
-    cookies: &CookieJar<'_>,
-    state: &State<AppState>,
-) -> Redirect {
-    // Check if session exists
-    if let Some(cookie) = cookies.get("session_id") {
-        let session_id = cookie.value();
-        
-        // Remove session from active sessions
-        let mut sessions = state.active_sessions.lock().await;
-        sessions.remove(session_id);
-        
-        // Remove cookie
-        cookies.remove(Cookie::build("session_id"));
-    }
-    
-    Redirect::to("/login.html")
-}
-
 // Handle missing favicon.ico requests gracefully
 #[get("/favicon.ico")]
 fn favicon() -> &'static str {
@@ -194,6 +188,6 @@ fn rocket() -> _ {
 
     rocket::build()
         .manage(app_state)
-        .mount("/", routes![index, login, process_login, dash, api, favicon, logout])
+        .mount("/", routes![index, login, process_login, dash, api, favicon])
         .mount("/", FileServer::from(relative!("templates")))
 }
