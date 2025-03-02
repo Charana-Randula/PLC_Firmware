@@ -1,16 +1,23 @@
 #[macro_use]
 extern crate rocket;
-
 use rocket::tokio::sync::Mutex; // Import Mutex for async locking
 use rocket::fs::{FileServer, relative}; // For serving static files
 use rocket::response::Redirect; // For redirecting responses
 use rocket::form::Form; // For handling forms
 use rocket::http::{Cookie, CookieJar}; // For handling cookies
 use rocket::State; // For managing application state
-
 use rusqlite::{Connection, params, Result}; // For interacting with SQLite
 use bcrypt::verify; // For bcrypt password hashing
 use std::sync::Arc; // For wrapping Mutex in Arc to share across threads
+use std::sync::atomic::{AtomicU64, Ordering};
+use std::collections::HashMap;
+
+#[derive(Clone)]
+struct AppState {
+    db_conn: DbConn,
+    active_sessions: Arc<Mutex<HashMap<String, bool>>>,
+    session_counter: Arc<AtomicU64>,
+}
 
 #[derive(FromForm)]
 struct Credentials {
@@ -78,15 +85,28 @@ fn login() -> (rocket::http::ContentType, Option<Vec<u8>>) {
     )
 }
 
+// Modify your login function to use a session token instead of username
 #[post("/login", data = "<credentials>")]
 async fn process_login(
     credentials: Form<Credentials>,
     cookies: &CookieJar<'_>,
-    db_conn: &State<DbConn>,
+    state: &State<AppState>,
 ) -> Result<Redirect, &'static str> {
-    match db_conn.verify_password(&credentials.username, &credentials.password).await {
+    match state.db_conn.verify_password(&credentials.username, &credentials.password).await {
         Ok(true) => {
-            cookies.add(Cookie::new("user_id", credentials.username.clone())); // Set cookie for session
+            // Generate a unique session token
+            let session_id = format!("session_{}", state.session_counter.fetch_add(1, Ordering::SeqCst));
+            
+            // Store the session in our active sessions
+            let mut sessions = state.active_sessions.lock().await;
+            sessions.insert(session_id.clone(), true);
+            
+            // Set cookie with the session token
+            let mut cookie = Cookie::new("session_id", session_id);
+            cookie.set_path("/");
+            cookie.set_http_only(true); // More secure
+            cookies.add(cookie);
+            
             Ok(Redirect::to("/dashboard.html"))
         }
         Ok(false) => Err("Invalid username or password"),
@@ -94,30 +114,65 @@ async fn process_login(
     }
 }
 
-// Dashboard route that requires authentication
 #[get("/dashboard.html")]
-fn dash(cookies: &CookieJar<'_>) -> Result<(rocket::http::ContentType, Option<Vec<u8>>), Redirect> {
-    if cookies.get("user_id").is_some() {
-        Ok((
-            rocket::http::ContentType::HTML,
-            std::fs::read(relative!("templates/dashboard.html")).ok(),
-        ))
-    } else {
-        Err(Redirect::to("/login.html")) // Redirect to login if not logged in
+async fn dash(
+    cookies: &CookieJar<'_>,
+    state: &State<AppState>,
+) -> Result<(rocket::http::ContentType, Option<Vec<u8>>), Redirect> {
+    if let Some(cookie) = cookies.get("session_id") {
+        let session_id = cookie.value();
+        let sessions = state.active_sessions.lock().await;
+        
+        if sessions.contains_key(session_id) {
+            return Ok((
+                rocket::http::ContentType::HTML,
+                std::fs::read(relative!("templates/dashboard.html")).ok(),
+            ));
+        }
     }
+    
+    Err(Redirect::to("/login.html"))
 }
 
-// Dashboard route that requires authentication
 #[get("/api.html")]
-fn api(cookies: &CookieJar<'_>) -> Result<(rocket::http::ContentType, Option<Vec<u8>>), Redirect> {
-    if cookies.get("user_id").is_some() {
-        Ok((
-            rocket::http::ContentType::HTML,
-            std::fs::read(relative!("templates/api.html")).ok(),
-        ))
-    } else {
-        Err(Redirect::to("/login.html")) // Redirect to login if not logged in
+async fn api(
+    cookies: &CookieJar<'_>,
+    state: &State<AppState>,
+) -> Result<(rocket::http::ContentType, Option<Vec<u8>>), Redirect> {
+    if let Some(cookie) = cookies.get("session_id") {
+        let session_id = cookie.value();
+        let sessions = state.active_sessions.lock().await;
+        
+        if sessions.contains_key(session_id) {
+            return Ok((
+                rocket::http::ContentType::HTML,
+                std::fs::read(relative!("templates/api.html")).ok(),
+            ));
+        }
     }
+    
+    Err(Redirect::to("/login.html"))
+}
+
+// Modify your logout function
+#[get("/logout")]
+async fn logout(
+    cookies: &CookieJar<'_>,
+    state: &State<AppState>,
+) -> Redirect {
+    // Check if session exists
+    if let Some(cookie) = cookies.get("session_id") {
+        let session_id = cookie.value();
+        
+        // Remove session from active sessions
+        let mut sessions = state.active_sessions.lock().await;
+        sessions.remove(session_id);
+        
+        // Remove cookie
+        cookies.remove(Cookie::build("session_id"));
+    }
+    
+    Redirect::to("/login.html")
 }
 
 // Handle missing favicon.ico requests gracefully
@@ -130,9 +185,15 @@ fn favicon() -> &'static str {
 #[launch]
 fn rocket() -> _ {
     let db_conn = DbConn::new("db/users.db").expect("Failed to initialize database connection");
+    
+    let app_state = AppState {
+        db_conn,
+        active_sessions: Arc::new(Mutex::new(HashMap::new())),
+        session_counter: Arc::new(AtomicU64::new(1)),
+    };
 
     rocket::build()
-        .manage(db_conn) // Share the database connection globally
-        .mount("/", routes![index, login, process_login, dash,api, favicon])
+        .manage(app_state)
+        .mount("/", routes![index, login, process_login, dash, api, favicon, logout])
         .mount("/", FileServer::from(relative!("templates")))
 }

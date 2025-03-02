@@ -9,6 +9,7 @@ dependencies = [
  "bcrypt",
  "rocket",
  "rusqlite",
+ "time",
 ]
 
 [[package]]
