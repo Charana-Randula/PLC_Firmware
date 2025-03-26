@@ -12,6 +12,8 @@ use std::sync::Arc; // For wrapping Mutex in Arc to share across threads
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::collections::HashMap;
 use time::{Duration, OffsetDateTime};
+use serde::Serialize;
+use sysinfo::{NetworkExt, NetworksExt, ProcessorExt, System, SystemExt};
 
 #[derive(Clone)]
 struct AppState {
@@ -175,6 +177,85 @@ fn favicon() -> &'static str {
     ""
 }
 
+#[derive(Serialize)]
+struct SystemStats {
+    cpu_usage: Vec<f32>,
+    packets_in_sec: u64,
+    packets_out_sec: u64,
+    memory_used: u64,
+    memory_total: u64,
+    memory_pressure: f32,
+}
+
+#[get("/stats")]
+async fn stats(
+    cookies: &CookieJar<'_>,
+    state: &State<AppState>,
+) -> Result<rocket::serde::json::Json<SystemStats>, Redirect> {
+    // First check if user is authenticated
+    if let Some(cookie) = cookies.get("session_id") {
+        let session_id = cookie.value();
+        let sessions = state.active_sessions.lock().await;
+        
+        if sessions.contains_key(session_id) {
+            let mut system = System::new_all();
+            system.refresh_all();
+
+            // Collect CPU usage stats
+            let cpu_usage: Vec<f32> = system
+                .processors()
+                .iter()
+                .map(|cpu| cpu.cpu_usage())
+                .collect();
+
+            // Get network stats
+            let (packets_in_sec, packets_out_sec) = system.networks().iter().fold((0, 0), |acc, (_, data)| {
+                (
+                    acc.0 + (data.received()),
+                    acc.1 + (data.transmitted()),
+                )
+            });
+
+            // Get memory stats
+            let memory_used = system.used_memory();
+            let memory_total = system.total_memory();
+            let memory_pressure = (memory_used as f32 / memory_total as f32) * 100.0;
+            
+            return Ok(rocket::serde::json::Json(SystemStats {
+                cpu_usage,
+                packets_in_sec,
+                packets_out_sec,
+                memory_used,
+                memory_total,
+                memory_pressure,
+            }));
+        }
+    }
+    
+    Err(Redirect::to("/login.html"))
+}
+
+// Add this new route handler
+#[get("/stats.html")]
+async fn stats_page(
+    cookies: &CookieJar<'_>,
+    state: &State<AppState>,
+) -> Result<(rocket::http::ContentType, Option<Vec<u8>>), Redirect> {
+    if let Some(cookie) = cookies.get("session_id") {
+        let session_id = cookie.value();
+        let sessions = state.active_sessions.lock().await;
+        
+        if sessions.contains_key(session_id) {
+            return Ok((
+                rocket::http::ContentType::HTML,
+                std::fs::read(relative!("templates/stats.html")).ok(),
+            ));
+        }
+    }
+    
+    Err(Redirect::to("/login.html"))
+}
+
 // Launch the Rocket app
 #[launch]
 fn rocket() -> _ {
@@ -188,6 +269,6 @@ fn rocket() -> _ {
 
     rocket::build()
         .manage(app_state)
-        .mount("/", routes![index, login, process_login, dash, api, favicon])
+        .mount("/", routes![index, login, process_login, dash, api, favicon, stats, stats_page])
         .mount("/", FileServer::from(relative!("templates")))
 }
