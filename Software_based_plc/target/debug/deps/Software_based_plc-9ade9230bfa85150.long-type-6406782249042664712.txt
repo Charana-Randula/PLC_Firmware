@@ -1,2 +1,0 @@
-rocket::tokio::sync::RwLock<rusqlite::Connection>
-Arc<rocket::tokio::sync::RwLock<rusqlite::Connection>>

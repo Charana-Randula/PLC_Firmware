@@ -1,1 +1,0 @@
-impl std::future::Future<Output = Result<(ContentType, std::option::Option<Vec<u8>>), Redirect>>
