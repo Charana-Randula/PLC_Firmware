@@ -14,6 +14,9 @@ use std::collections::HashMap;
 use time::{Duration, OffsetDateTime};
 use serde::Serialize;
 use sysinfo::{NetworkExt, NetworksExt, ProcessorExt, System, SystemExt};
+use rocket::serde::json::Json;
+use rocket::request::{FromRequest, Outcome};
+use rocket::Request;
 
 #[derive(Clone)]
 struct AppState {
@@ -35,20 +38,23 @@ struct User {
 
 #[derive(Clone)]
 struct DbConn {
-    conn: Arc<Mutex<Connection>>,
+    users_conn: Arc<Mutex<Connection>>,
+    iov_conn: Arc<Mutex<Connection>>,
 }
 
 impl DbConn {
-    fn new(db_path: &str) -> Result<Self> {
-        let conn = Connection::open(db_path)?;
+    fn new(users_db_path: &str, iov_db_path: &str) -> Result<Self> {
+        let users_conn = Connection::open(users_db_path)?;
+        let iov_conn = Connection::open(iov_db_path)?;
         Ok(DbConn {
-            conn: Arc::new(Mutex::new(conn)),
+            users_conn: Arc::new(Mutex::new(users_conn)),
+            iov_conn: Arc::new(Mutex::new(iov_conn)),
         })
     }
 
-    // Make get_user async
+    // User authentication methods use users_conn
     async fn get_user(&self, username: &str) -> Result<Option<User>> {
-        let conn = self.conn.lock().await;
+        let conn = self.users_conn.lock().await;
         let mut stmt = conn.prepare("SELECT id, username, password FROM users WHERE username = ?")?;
         let mut user_iter = stmt.query_map(params![username], |row| {
             Ok(User {
@@ -63,13 +69,183 @@ impl DbConn {
         }
     }
 
-    // Make verify_password async
     async fn verify_password(&self, username: &str, password: &str) -> Result<bool> {
         if let Some(user) = self.get_user(username).await? {
             Ok(verify(password, &user.password).unwrap_or(false))
         } else {
             Ok(false)
         }
+    }
+
+    // IO and Variables methods use iov_conn
+    async fn get_analog_inputs_outputs(&self, latest: bool) -> Result<Vec<AnalogInputsOutputs>> {
+        let conn = self.iov_conn.lock().await;
+        let query = if latest {
+            "SELECT * FROM analog_inputs_outputs ORDER BY timestamp DESC LIMIT 1"
+        } else {
+            "SELECT * FROM analog_inputs_outputs"
+        };
+
+        let mut stmt = conn.prepare(query)?;
+        let analog_data = stmt.query_map([], |row| {
+            Ok(AnalogInputsOutputs {
+                id: row.get(0)?,
+                analog_input_0: row.get(1)?,
+                analog_input_1: row.get(2)?,
+                analog_input_2: row.get(3)?,
+                analog_input_3: row.get(4)?,
+                analog_input_4: row.get(5)?,
+                analog_input_5: row.get(6)?,
+                analog_input_6: row.get(7)?,
+                analog_input_7: row.get(8)?,
+                analog_output_0: row.get(9)?,
+                analog_output_1: row.get(10)?,
+                analog_output_2: row.get(11)?,
+                analog_output_3: row.get(12)?,
+                analog_output_4: row.get(13)?,
+                analog_output_5: row.get(14)?,
+                analog_output_6: row.get(15)?,
+                analog_output_7: row.get(16)?,
+                timestamp: row.get(17)?,
+            })
+        })?;
+        analog_data.collect()
+    }
+
+    async fn get_digital_inputs_outputs(&self, latest: bool) -> Result<Vec<DigitalInputsOutputs>> {
+        let conn = self.iov_conn.lock().await;
+        let query = if latest {
+            "SELECT * FROM digital_inputs_outputs ORDER BY timestamp DESC LIMIT 1"
+        } else {
+            "SELECT * FROM digital_inputs_outputs"
+        };
+
+        let mut stmt = conn.prepare(query)?;
+        let digital_data = stmt.query_map([], |row| {
+            Ok(DigitalInputsOutputs {
+                id: row.get(0)?,
+                digital_input_0: row.get(1)?,
+                digital_input_1: row.get(2)?,
+                digital_input_2: row.get(3)?,
+                digital_input_3: row.get(4)?,
+                digital_input_4: row.get(5)?,
+                digital_input_5: row.get(6)?,
+                digital_input_6: row.get(7)?,
+                digital_input_7: row.get(8)?,
+                digital_output_0: row.get(9)?,
+                digital_output_1: row.get(10)?,
+                digital_output_2: row.get(11)?,
+                digital_output_3: row.get(12)?,
+                digital_output_4: row.get(13)?,
+                digital_output_5: row.get(14)?,
+                digital_output_6: row.get(15)?,
+                digital_output_7: row.get(16)?,
+                timestamp: row.get(17)?,
+            })
+        })?;
+        digital_data.collect()
+    }
+
+    async fn get_variables(&self, latest: bool) -> Result<Vec<Variables>> {
+        let conn = self.iov_conn.lock().await;
+        let query = if latest {
+            "SELECT * FROM variables ORDER BY timestamp DESC LIMIT 1"
+        } else {
+            "SELECT * FROM variables"
+        };
+
+        let mut stmt = conn.prepare(query)?;
+        let variables_data = stmt.query_map([], |row| {
+            Ok(Variables {
+                id: row.get(0)?,
+                kp: row.get(1)?,
+                ki: row.get(2)?,
+                kd: row.get(3)?,
+                system_state: row.get(4)?,
+                timestamp: row.get(5)?,
+            })
+        })?;
+        variables_data.collect()
+    }
+
+}
+
+// Add this function after the DbConn implementation
+fn validate_api_key(apikey: &str) -> bool {
+    let conn = Connection::open("db/users.db").unwrap();
+    let mut stmt = conn.prepare("SELECT COUNT(*) FROM users WHERE apikey = ?1").unwrap();
+    let count: i64 = stmt.query_row([apikey], |row| row.get(0)).unwrap_or(0);
+    count > 0
+}
+
+#[derive(Serialize)]
+struct AnalogInputsOutputs {
+    id: i32,
+    analog_input_0: f64,
+    analog_input_1: f64,
+    analog_input_2: f64,
+    analog_input_3: f64,
+    analog_input_4: f64,
+    analog_input_5: f64,
+    analog_input_6: f64,
+    analog_input_7: f64,
+    analog_output_0: f64,
+    analog_output_1: f64,
+    analog_output_2: f64,
+    analog_output_3: f64,
+    analog_output_4: f64,
+    analog_output_5: f64,
+    analog_output_6: f64,
+    analog_output_7: f64,
+    timestamp: String,
+}
+
+#[derive(Serialize)]
+struct DigitalInputsOutputs {
+    id: i32,
+    digital_input_0: bool,
+    digital_input_1: bool,
+    digital_input_2: bool,
+    digital_input_3: bool,
+    digital_input_4: bool,
+    digital_input_5: bool,
+    digital_input_6: bool,
+    digital_input_7: bool,
+    digital_output_0: bool,
+    digital_output_1: bool,
+    digital_output_2: bool,
+    digital_output_3: bool,
+    digital_output_4: bool,
+    digital_output_5: bool,
+    digital_output_6: bool,
+    digital_output_7: bool,
+    timestamp: String,
+}
+
+#[derive(Serialize)]
+struct Variables {
+    id: i32,
+    kp: f64,
+    ki: f64,
+    kd: f64,
+    system_state: String,
+    timestamp: String,
+}
+
+#[allow(dead_code)]
+struct ApiKey(String);
+
+#[rocket::async_trait]
+impl<'r> FromRequest<'r> for ApiKey {
+    type Error = ();
+
+    async fn from_request(request: &'r Request<'_>) -> Outcome<Self, Self::Error> {
+        if let Some(api_key) = request.headers().get_one("x-api-key") {
+            if validate_api_key(api_key) {
+                return Outcome::Success(ApiKey(api_key.to_string()));
+            }
+        }
+        Outcome::Error((rocket::http::Status::Unauthorized, ()))
     }
 }
 
@@ -256,10 +432,49 @@ async fn stats_page(
     Err(Redirect::to("/login.html"))
 }
 
+#[get("/api/analog_inputs_outputs?<latest>")]
+async fn get_analog_data(
+    _key: ApiKey,
+    latest: Option<bool>,
+    state: &State<AppState>
+) -> Json<Vec<AnalogInputsOutputs>> {
+    let data = state.db_conn.get_analog_inputs_outputs(latest.unwrap_or(false))
+        .await
+        .unwrap_or_default();
+    Json(data)
+}
+
+#[get("/api/digital_inputs_outputs?<latest>")]
+async fn get_digital_data(
+    _key: ApiKey,
+    latest: Option<bool>,
+    state: &State<AppState>
+) -> Json<Vec<DigitalInputsOutputs>> {
+    let data = state.db_conn.get_digital_inputs_outputs(latest.unwrap_or(false))
+        .await
+        .unwrap_or_default();
+    Json(data)
+}
+
+#[get("/api/variables?<latest>")]
+async fn get_system_variables(
+    _key: ApiKey,
+    latest: Option<bool>,
+    state: &State<AppState>
+) -> Json<Vec<Variables>> {
+    let data = state.db_conn.get_variables(latest.unwrap_or(false))
+        .await
+        .unwrap_or_default();
+    Json(data)
+}
+
 // Launch the Rocket app
 #[launch]
 fn rocket() -> _ {
-    let db_conn = DbConn::new("db/users.db").expect("Failed to initialize database connection");
+    let db_conn = DbConn::new(
+        "db/users.db",
+        "../Logic/IOV.db"  // Updated path to IOV.db
+    ).expect("Failed to initialize database connections");
     
     let app_state = AppState {
         db_conn,
@@ -269,6 +484,9 @@ fn rocket() -> _ {
 
     rocket::build()
         .manage(app_state)
-        .mount("/", routes![index, login, process_login, dash, api, favicon, stats, stats_page])
+        .mount("/", routes![
+            index, login, process_login, dash, api, favicon, stats, stats_page,
+            get_analog_data, get_digital_data, get_system_variables
+        ])
         .mount("/", FileServer::from(relative!("templates")))
 }

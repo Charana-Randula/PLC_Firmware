@@ -200,7 +200,7 @@
             </a>
             <a href="/viewcode.html" class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md flex items-center gap-2">
                 <i class="fas fa-code"></i>
-                <span>Rust Code</span>
+                <span>Terminal</span>
             </a>
             <a href="/stats.html" class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md flex items-center gap-2">
                 <i class="fas fa-chart-line"></i>
@@ -225,28 +225,12 @@
     </nav>
 
     <div class="container mx-auto p-4">
-        <div class="bg-gray-200 shadow-md rounded-lg p-4 mb-6">
-            <h2 class="text-lg font-semibold text-center mb-4">API Documentation</h2>
-            <div class="space-y-4">
-                <details class="bg-gray-100 p-4 rounded">
-                    <summary class="cursor-pointer font-semibold">Endpoint 1: Fetch Device Status</summary>
-                    <p class="text-sm text-gray-700 mt-2">Retrieve the current status of the device.</p>
-                    <pre class="bg-gray-100 p-2 rounded mt-2"><code>GET /api/device/status</code></pre>
-                    <p class="text-sm text-gray-700 mt-2">Response Example:</p>
-                    <pre class="bg-gray-100 p-2 rounded"><code>{
-    "status": "active",
-    "uptime": "24 hours"
-}</code></pre>
-                </details>
-                <!-- Add more API documentation sections as needed -->
-            </div>
-        </div>
-
-        <!-- API Key Section -->
+        <!-- API Key Management Section -->
         <div class="bg-white shadow-md rounded-lg p-4 mb-6">
             <h2 class="text-lg font-semibold mb-4">API Key Management</h2>
             <div class="mb-4">
                 <p class="text-sm text-gray-600 mb-2">Your API key is required for all API requests. Keep it secure and do not share it.</p>
+                <p class="text-sm text-gray-600 mb-2 font-bold">Note: For testing purposes, the API key <code>'ABCD'</code> always works.</p>
                 <div id="api-key-display" class="api-key-container relative mb-4">
                     <span id="api-key-text" class="text-sm font-mono pr-10">No API key generated</span>
                     <button id="copy-api-key" class="copy-button text-gray-600 hover:text-gray-900 hidden">
@@ -264,6 +248,80 @@
                     </button>
                 </div>
                 <p class="text-xs text-gray-500 mt-2">Note: Generating a new key will invalidate any previous keys.</p>
+            </div>
+        </div>
+
+        <!-- API Documentation Section -->
+        <div class="bg-gray-200 shadow-md rounded-lg p-4 mb-6">
+            <h2 class="text-lg font-semibold text-center mb-4">API Documentation</h2>
+            <div class="space-y-4">
+                <!-- Endpoint 1: Fetch Analog Inputs/Outputs -->
+                <details class="bg-gray-100 p-4 rounded">
+                    <summary class="cursor-pointer font-semibold">Endpoint 1: Fetch Analog Inputs/Outputs</summary>
+                    <p class="text-sm text-gray-700 mt-2">Retrieve the analog inputs and outputs data.</p>
+                    <pre class="bg-gray-100 p-2 rounded mt-2"><code>GET /api/analog_inputs_outputs?latest=true</code></pre>
+                    <p class="text-sm text-gray-700 mt-2">Optional Query Parameter:</p>
+                    <ul class="text-sm text-gray-700 list-disc pl-5">
+                        <li><code>latest=true</code>: Fetch the most recent data.</li>
+                        <li><code>latest=false</code>: Fetch all available data.</li>
+                    </ul>
+                    <p class="text-sm text-gray-700 mt-2">Response Example:</p>
+                    <pre class="bg-gray-100 p-2 rounded"><code>{
+    "id": 1,
+    "analog_input_0": 3.3,
+    "analog_input_1": 2.5,
+    "analog_output_0": 1.2,
+    "timestamp": "2025-03-31T12:00:00Z"
+}</code></pre>
+                    <p class="text-sm text-gray-700 mt-2">Example Test Command:</p>
+                    <div class="relative bg-gray-100 p-2 rounded">
+                        <code id="curl-command">curl -H "x-api-key: ABCD" "http://localhost:8000/api/analog_inputs_outputs?latest=true"</code>
+                        <button id="copy-curl-command" class="absolute right-2 top-2 text-gray-600 hover:text-gray-900">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">Note: This is a temporary example for testing purposes.</p>
+                </details>
+
+                <!-- Endpoint 2: Fetch Digital Inputs/Outputs -->
+                <details class="bg-gray-100 p-4 rounded">
+                    <summary class="cursor-pointer font-semibold">Endpoint 2: Fetch Digital Inputs/Outputs</summary>
+                    <p class="text-sm text-gray-700 mt-2">Retrieve the digital inputs and outputs data.</p>
+                    <pre class="bg-gray-100 p-2 rounded mt-2"><code>GET /api/digital_inputs_outputs?latest=true</code></pre>
+                    <p class="text-sm text-gray-700 mt-2">Optional Query Parameter:</p>
+                    <ul class="text-sm text-gray-700 list-disc pl-5">
+                        <li><code>latest=true</code>: Fetch the most recent data.</li>
+                        <li><code>latest=false</code>: Fetch all available data.</li>
+                    </ul>
+                    <p class="text-sm text-gray-700 mt-2">Response Example:</p>
+                    <pre class="bg-gray-100 p-2 rounded"><code>{
+    "id": 1,
+    "digital_input_0": true,
+    "digital_output_0": false,
+    "timestamp": "2025-03-31T12:00:00Z"
+}</code></pre>
+                </details>
+
+                <!-- Endpoint 3: Fetch System Variables -->
+                <details class="bg-gray-100 p-4 rounded">
+                    <summary class="cursor-pointer font-semibold">Endpoint 3: Fetch System Variables</summary>
+                    <p class="text-sm text-gray-700 mt-2">Retrieve the system variables such as KP, KI, KD, and system state.</p>
+                    <pre class="bg-gray-100 p-2 rounded mt-2"><code>GET /api/variables?latest=true</code></pre>
+                    <p class="text-sm text-gray-700 mt-2">Optional Query Parameter:</p>
+                    <ul class="text-sm text-gray-700 list-disc pl-5">
+                        <li><code>latest=true</code>: Fetch the most recent data.</li>
+                        <li><code>latest=false</code>: Fetch all available data.</li>
+                    </ul>
+                    <p class="text-sm text-gray-700 mt-2">Response Example:</p>
+                    <pre class="bg-gray-100 p-2 rounded"><code>{
+    "id": 1,
+    "kp": 1.0,
+    "ki": 0.5,
+    "kd": 0.1,
+    "system_state": "active",
+    "timestamp": "2025-03-31T12:00:00Z"
+}</code></pre>
+                </details>
             </div>
         </div>
     </div>
@@ -405,7 +463,7 @@
             }, 3000);
         }
 
-                // IP Address fetch
+        // IP Address fetch
         async function fetchIP() {
             try {
                 const response = await fetch('https://api.ipify.org?format=json');
@@ -417,6 +475,20 @@
             }
         }
         fetchIP();
+
+        // Copy curl command functionality
+        const copyCurlCommandBtn = document.getElementById('copy-curl-command');
+        const curlCommand = document.getElementById('curl-command').textContent;
+
+        copyCurlCommandBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(curlCommand)
+                .then(() => {
+                    alert('Curl command copied to clipboard!');
+                })
+                .catch(err => {
+                    console.error('Failed to copy curl command:', err);
+                });
+        });
     </script>
 </body>
 </html>

@@ -190,7 +190,7 @@
             </a>
             <a href="/viewcode.html" class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md flex items-center gap-2">
                 <i class="fas fa-code"></i>
-                <span>Rust Code</span>
+                <span>Terminal</span>
             </a>
             <a href="/stats.html" class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md flex items-center gap-2">
                 <i class="fas fa-chart-line"></i>
@@ -215,28 +215,28 @@
     </nav>
 
     <div class="container mx-auto p-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <!-- Digital Inputs -->
-            <div class="bg-gray-200 shadow-md rounded-lg p-4">
-                <h2 class="text-lg font-semibold text-center mb-4">Digital Inputs</h2>
+            <div class="bg-gray-200 shadow-lg rounded-lg p-6 min-h-[300px]">
+                <h2 class="text-xl font-semibold text-center mb-6">Digital Inputs</h2>
                 <div id="digitalInputs" class="space-y-4"></div>
             </div>
 
             <!-- Analog Inputs -->
-            <div class="bg-gray-200 shadow-md rounded-lg p-4">
-                <h2 class="text-lg font-semibold text-center mb-4">Analog Inputs</h2>
+            <div class="bg-gray-200 shadow-lg rounded-lg p-6 min-h-[300px]">
+                <h2 class="text-xl font-semibold text-center mb-6">Analog Inputs</h2>
                 <div id="analogInputs" class="space-y-4"></div>
             </div>
 
             <!-- Digital Outputs -->
-            <div class="bg-purple-100 shadow-md rounded-lg p-4">
-                <h2 class="text-lg font-semibold text-center mb-4">Digital Outputs</h2>
+            <div class="bg-purple-100 shadow-lg rounded-lg p-6 min-h-[300px]">
+                <h2 class="text-xl font-semibold text-center mb-6">Digital Outputs</h2>
                 <div id="digitalOutputs" class="space-y-4"></div>
             </div>
 
             <!-- Analog Outputs -->
-            <div class="bg-purple-100 shadow-md rounded-lg p-4">
-                <h2 class="text-lg font-semibold text-center mb-4">Analog Outputs</h2>
+            <div class="bg-purple-100 shadow-lg rounded-lg p-6 min-h-[300px]">
+                <h2 class="text-xl font-semibold text-center mb-6">Analog Outputs</h2>
                 <div id="analogOutputs" class="space-y-4"></div>
             </div>
         </div>
@@ -300,13 +300,7 @@
             container.innerHTML = state.analogInputs.map((value, i) => `
                 <div class="flex justify-between items-center">
                     <span class="text-sm font-medium text-purple-700">Input ${i + 1}</span>
-                    <div class="gauge">
-                        <svg class="w-full h-full">
-                            <circle cx="50%" cy="50%" r="15" class="bg-circle"></circle>
-                            <circle cx="50%" cy="50%" r="15" class="progress-circle" style="stroke-dashoffset: ${100 - value};"></circle>
-                            <text x="50%" y="50%" class="text">${value}</text>
-                        </svg>
-                    </div>
+                    <span class="text-sm font-medium text-gray-700">${value.toFixed(2)}</span>
                 </div>
             `).join('');
         }
@@ -333,13 +327,7 @@
             container.innerHTML = state.analogOutputs.map((value, i) => `
                 <div class="flex justify-between items-center">
                     <span class="text-sm font-medium text-purple-700">Output ${i + 1}</span>
-                    <div class="gauge">
-                        <svg class="w-full h-full">
-                            <circle cx="50%" cy="50%" r="15" class="bg-circle"></circle>
-                            <circle cx="50%" cy="50%" r="15" class="progress-circle" style="stroke-dashoffset: ${100 - value};"></circle>
-                            <text x="50%" y="50%" class="text">${value}</text>
-                        </svg>
-                    </div>
+                    <span class="text-sm font-medium text-gray-700">${value.toFixed(2)}</span>
                 </div>
             `).join('');
         }
@@ -372,12 +360,95 @@
             }
         }
 
+        async function fetchDigitalInputsOutputs() {
+            try {
+                const response = await fetch('/api/digital_inputs_outputs?latest=true', {
+                    headers: { 'x-api-key': 'ABCD' } // Replace with your API key
+                });
+                const data = await response.json();
+
+                // Update the state with the fetched data
+                state.digitalInputs = [
+                    data[0].digital_input_0,
+                    data[0].digital_input_1,
+                    data[0].digital_input_2,
+                    data[0].digital_input_3,
+                    data[0].digital_input_4,
+                    data[0].digital_input_5,
+                    data[0].digital_input_6,
+                ];
+
+                state.digitalOutputs = [
+                    data[0].digital_output_0,
+                    data[0].digital_output_1,
+                    data[0].digital_output_2,
+                    data[0].digital_output_3,
+                    data[0].digital_output_4,
+                    data[0].digital_output_5,
+                    data[0].digital_output_6,
+                ];
+
+                // Re-render the digital inputs and outputs
+                renderDigitalInputs();
+                renderDigitalOutputs();
+            } catch (error) {
+                console.error('Error fetching digital inputs/outputs:', error);
+            }
+        }
+
+        async function fetchAnalogInputsOutputs() {
+            try {
+                const response = await fetch('/api/analog_inputs_outputs?latest=true', {
+                    headers: { 'x-api-key': 'ABCD' } // Replace with your API key
+                });
+                const data = await response.json();
+
+                // Update the state with the fetched data
+                state.analogInputs = [
+                    data[0].analog_input_0,
+                    data[0].analog_input_1,
+                    data[0].analog_input_2,
+                    data[0].analog_input_3,
+                    data[0].analog_input_4,
+                    data[0].analog_input_5,
+                    data[0].analog_input_6,
+                ];
+
+                state.analogOutputs = [
+                    data[0].analog_output_0,
+                    data[0].analog_output_1,
+                    data[0].analog_output_2,
+                    data[0].analog_output_3,
+                    data[0].analog_output_4,
+                    data[0].analog_output_5,
+                    data[0].analog_output_6,
+                ];
+
+                // Re-render the analog inputs and outputs
+                renderAnalogInputs();
+                renderAnalogOutputs();
+            } catch (error) {
+                console.error('Error fetching analog inputs/outputs:', error);
+            }
+        }
+
         // Initial renders
         renderDigitalInputs();
         renderAnalogInputs();
         renderDigitalOutputs();
         renderAnalogOutputs();
         fetchIP();
+
+        // Fetch data and render the dashboard on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchDigitalInputsOutputs();
+            fetchAnalogInputsOutputs();
+        });
+
+        setInterval(() => {
+            fetchDigitalInputsOutputs();
+            fetchAnalogInputsOutputs();
+        }, 1000); // Fetch data every 5 seconds
     </script>
 </body>
 </html>
