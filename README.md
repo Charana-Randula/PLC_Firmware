@@ -1,99 +1,167 @@
-Here's the complete `README.md` content for your project **pastlang** (the open-source PLC firmware using Rust and Rocket.rs), ready to copy directly into your repository:
-
-````markdown
 # An Open-Source PLC Firmware based on Rust and Rocket.rs
 
-A software-defined PLC (Programmable Logic Controller) project designed to provide a modern, open-source solution for industrial automation. This project leverages the Rust programming language and the Rocket.rs web framework to deliver a robust and efficient firmware for PLC systems.
+## 🛠️ Installation Guide
 
-## Features
+### ✅ System Requirements
 
-- **Analog Input/Output Management**: Retrieve and manage analog input and output data via a RESTful API.
-- **Secure API Key Management**: Generate and revoke API keys for secure access.
-- **Extensible Design**: Built with Rust for safety, performance, and scalability.
+* Raspberry Pi (recommended) or any Linux system with GPIO access
+* Rust toolchain (`cargo`, `rustc`, etc.)
+* Git
+* Internet access (for pulling dependencies)
 
-## API Overview
+---
 
-### Endpoint: Fetch Analog Inputs/Outputs
+### 📦 1. Install Prerequisites
 
-- **URL**: `GET /api/analog_inputs_outputs`
-- **Query Parameters**:
-  - `latest=true`: Fetch the most recent data.
-  - `latest=false`: Fetch all available data.
-- **Response Example**:
-  ```json
-  {
-      "id": 1,
-      "analog_input_0": 3.3,
-      "analog_input_1": 2.5,
-      "analog_output_0": 1.2,
-      "timestamp": "2025-03-31T12:00:00Z"
-  }
-````
+#### 🔧 Install Rust
 
-## Installation Guide
-
-### Prerequisites
-
-1. **Rust**: Install Rust by following the instructions at [rust-lang.org](https://www.rust-lang.org/tools/install).
-2. **Rocket.rs**: Ensure Rocket.rs dependencies are installed. Refer to the [Rocket.rs Getting Started Guide](https://rocket.rs/v0.5-rc/guide/).
-3. **Node.js and npm** *(optional)*: Required if you plan to modify or build the frontend templates.
-
-### Steps
-
-1. **Clone the Repository**:
-
-   ```bash
-   git clone https://github.com/your-repo/EEP1.git
-   cd EEP1
-   ```
-
-2. **Build the Project**:
-
-   ```bash
-   cargo build --release
-   ```
-
-3. **Run the Server**:
-
-   ```bash
-   cargo run
-   ```
-
-4. **Access the API**:
-   Open your browser or API client and navigate to `http://localhost:8000`.
-
-### Testing the API
-
-Use the following example command to test the API:
+If Rust is not already installed:
 
 ```bash
-curl -X GET "http://localhost:8000/api/analog_inputs_outputs?latest=true"
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
-### Frontend Development *(Optional)*
+After installation:
 
-If you need to modify the frontend templates:
-
-1. Navigate to the `Server/templates` directory.
-2. Edit the HTML files as needed.
-3. Restart the server to apply changes.
-
-## Contributing
-
-Contributions are welcome! Please fork the repository and submit a pull request with your changes.
-
-## License
-
-This project is licensed under the MIT License. See the `LICENSE` file for details.
-
+```bash
+source $HOME/.cargo/env
+rustup update
 ```
 
-Let me know if you’d like to:
+#### 📁 Install Other Tools
 
-- Add more API routes and examples.
-- Include system architecture or GPIO handling details.
-- Include a diagram or architecture sketch.
-- Prepare this for deployment on a Raspberry Pi.
-
-I'm happy to help tailor this for developer onboarding or academic submission.
+```bash
+sudo apt update
+sudo apt install git build-essential pkg-config libssl-dev libsqlite3-dev
 ```
+
+For GPIO support on Raspberry Pi:
+
+```bash
+sudo apt install libgpiod-dev
+```
+
+---
+
+### 📂 2. Clone the Repository
+
+```bash
+git clone https://github.com/your-repo/EEP1.git
+cd EEP1
+```
+
+---
+
+### ⚙️ 3. Configure Environment (Optional)
+
+If you use environment variables (e.g., for database URLs, API keys, etc.), create a `.env` file in the project root:
+
+```env
+ROCKET_ADDRESS=0.0.0.0
+ROCKET_PORT=8000
+API_KEY_SECRET=your-secret-key
+```
+
+Or modify directly in `Rocket.toml`.
+
+---
+
+### 🏗️ 4. Build the Project
+
+In the root directory:
+
+```bash
+cargo build --release
+```
+
+This compiles the project in release mode for better performance.
+
+---
+
+### ▶️ 5. Run the Server
+
+To start the web server:
+
+```bash
+cargo run --release
+```
+
+If using systemd or supervisor for deployment, you can daemonize it — ask if you want a unit file.
+
+---
+
+### 🌐 6. Access the Web Interface or API
+
+Once the server is running, open a browser or API tool and go to:
+
+```
+http://localhost:8000
+```
+
+Example API request:
+
+```bash
+curl "http://localhost:8000/api/analog_inputs_outputs?latest=true"
+```
+
+---
+
+### 🧪 7. Test GPIO (Optional)
+
+If you're using GPIO functionality, you may need to run the binary with `sudo`:
+
+```bash
+sudo cargo run --release
+```
+
+Test that your pins are accessible (especially on a Raspberry Pi using `/dev/gpiochip0`).
+
+---
+
+## ⚠️ Common Build Errors & Fixes
+
+### ❌ Error: `cannot find -lsqlite3` or `libsqlite3-sys` build failure
+
+**Cause:** Missing SQLite development headers.([Stack Overflow][1])
+
+**Fix:**
+
+```bash
+sudo apt install libsqlite3-dev
+```
+
+This installs the necessary C headers and libraries required by `libsqlite3-sys`.
+
+### ❌ Error: `pkg-config` not found
+
+**Cause:** `pkg-config` is missing, which is used to locate libraries during the build process.([Docs.rs][2])
+
+**Fix:**
+
+```bash
+sudo apt install pkg-config
+```
+
+### ❌ Error: `libssl-dev` missing (for TLS support)
+
+**Cause:** Missing OpenSSL development libraries.
+
+**Fix:**
+
+```bash
+sudo apt install libssl-dev
+```
+
+---
+
+## 📚 Additional Resources
+
+* [libsqlite3-sys Documentation](https://docs.rs/libsqlite3-sys/latest/libsqlite3_sys/)
+* [rusqlite GitHub Repository](https://github.com/rusqlite/rusqlite)
+
+---
+
+Let me know if you need further assistance or additional information!
+
+[1]: https://stackoverflow.com/questions/65559230/how-to-fix-cannot-find-lsqlite3-error-when-deploying-rust-app-to-heroku?utm_source=chatgpt.com "How to fix \"cannot find -lsqlite3\" error when deploying Rust app to ..."
+[2]: https://docs.rs/crate/libsqlite3-sys/latest?utm_source=chatgpt.com "libsqlite3-sys 0.33.0 - Docs.rs"
