@@ -46,7 +46,7 @@ sudo apt install libgpiod-dev
 ### 📂 2. Clone the Repository
 
 ```bash
-git clone https://github.com/your-repo/EEP1.git
+git clone https://github.com/Charana-Randula/PLC_Firmware/tree/main
 cd EEP1
 ```
 
