@@ -160,8 +160,3 @@ sudo apt install libssl-dev
 * [rusqlite GitHub Repository](https://github.com/rusqlite/rusqlite)
 
 ---
-
-Let me know if you need further assistance or additional information!
-
-[1]: https://stackoverflow.com/questions/65559230/how-to-fix-cannot-find-lsqlite3-error-when-deploying-rust-app-to-heroku?utm_source=chatgpt.com "How to fix \"cannot find -lsqlite3\" error when deploying Rust app to ..."
-[2]: https://docs.rs/crate/libsqlite3-sys/latest?utm_source=chatgpt.com "libsqlite3-sys 0.33.0 - Docs.rs"
